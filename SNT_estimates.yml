@@ -1,0 +1,150 @@
+# *** Format of estimates ***
+# Cause Area:
+#   scale_LT_1:
+#     name of source 1: [tenth, *optional median, ninetieth]
+#     name of source 2: [tenth percentile, *optional median, ninetieth percentile]
+#   scale_LT_2a:
+#   scale_LT_2b:
+#   scale_ST-Human:
+#   scale_ST-Animal:
+#   crowdedness_people:
+#   crowdedness_dollars:
+#   tractability_people:
+#   tractability_dollars:
+
+AIS:
+  scale_LT:
+    OxPrio: [0.001, 0.01, 0.06] 
+    FHI_08: [0.01, 0.05, 0.15]
+    80k: [0.01, 0.1]
+  scale_ST-Human:
+    Me: [12.4e+9, 74.1e+9]
+  scale_ST-Animal:
+    Me: [10, 2.9e+8]
+  crowdedness_people:
+    Me: [40,50,70]
+  crowdedness_dollars:
+    80k: [8.e+6, 10.e+6, 12.e+6]
+  tractability_people:
+    OxPrio: [0.001,0.01,0.06]
+  tractability_dollars:
+    80k: [0.005, 0.01, 0.02]
+
+EA:
+  scale_LT:
+    80k: [0.001, 0.01]
+  scale_ST-Human:
+    80k: [3250000000,32500000000]
+  scale_ST-Animal:
+    Me: [1.e+6, 2.9e+10]
+  crowdedness_people:
+    Me: [50,80,120]
+  crowdedness_dollars:
+    80k: [5.E+6, 10.E+6]
+  tractability_people:
+    Me: [0.001,0.01,0.1]
+  tractability_dollars:
+    80k: [0.001,0.01,0.1]
+
+GPR:
+  scale_LT:
+    80K: [0.001,0.01]
+  scale_ST-Human:
+    Me: [2.5E+9, 2.5E+10]
+  scale_ST-Animal:
+    Me: [29.E+6, 29.E+8]
+  crowdedness_people:
+    Me: [10,30,50]
+  crowdedness_dollars:
+    80k: [5.E+6, 10.E+6]
+  tractability_people:
+    Me: [0.001,0.015,0.1]
+  tractability_dollars:
+    80k: [0.001,0.01,0.1]
+
+Institutions:
+  scale_LT:
+    80k: [0.001,0.01]
+  scale_ST-Human:
+    Me: [2.5E+9, 2.5E+10]
+  scale_ST-Animal:
+    Me: [29.E+6, 29.E+8]
+  crowdedness_people:
+    80k: [100,1000]
+  crowdedness_dollars:
+    80k: [5.E+6, 1.5E+8]
+  tractability_people:
+    80k: [0.005,0.01,0.015]
+  tractability_dollars:
+    80k: [0.005,0.01,0.015]
+
+Factory farming:
+  scale_LT:
+    80k: [0.0001,0.001]
+  scale_ST-Human:
+    Me: [1,10] # so that the lognormal fitter doesn't break (but really it's zero)
+  scale_ST-Animal:
+    Bollard podcast: [1.0E+12,2.9E+12]
+  crowdedness_people:
+    80k: [800,1000,1200]
+  crowdedness_dollars:
+    80k: [10.E+6, 100.E+6]
+    Bollard podcast: [4.9E+7,5.1E+7]
+  tractability_people:
+    80k: [0.008, 0.01, 0.012]
+  tractability_dollars:
+    80k: [0.008, 0.01, 0.012]
+
+Biorisk:
+  scale_LT:
+    80k: [0.01,0.1]
+    GPP GCR report 2016 (extinction from an engineered pandemic): [0.00007, 0.07]
+    FHI_08: [0.001,0.02,0.1]
+  scale_ST-Human:
+    GPP GCR report 2016 (non-extinction from a natural pandemic): [380.E+6, 36.E+9]
+    UK National Risk Register (as cited in GPP GCR report): [5.24E+08, 2.10E+09]
+  scale_ST-Animal:
+    Me: [1,10] # proxy for 0 that won't break lognormal
+  crowdedness_people:
+    80k: [8,12]
+  crowdedness_dollars:
+    80k: [1.E+9, 5.E+9]
+  tractability_people:
+    Me: [0.008, 0.01, 0.012]
+  tractability_dollars:
+    80k: [0.008, 0.01, 0.012]
+
+Nuclear:
+  scale_LT:
+    GPP GCR report 2016: [0.00001,0.07]
+    FHI_08: [1.E-5,0.01,0.05]
+    80k: [0.006,0.06]
+  scale_ST-Human:
+    Good Judgment superforecasters: [16.3E+6, 28.6E+6]
+  scale_ST-Animal:
+    Me: [1,10] # proxy for 0 that won't break lognormal
+  crowdedness_people:
+    Me: [15,150]
+  crowdedness_dollars:
+    80k: [1.E+9,10.E+9]
+  tractability_people:
+    Me: [0.001,0.01]
+  tractability_dollars:
+    80k: [0.001,0.01]
+
+Health:
+  scale_LT:
+    Me: [6.33122E-05, 4.91E-04, 0.001128382]
+  scale_ST-Human:
+    80k: [65000000,162500000]
+  scale_ST-Animal:
+    Me: [-29.E+12, -29.E+10, -29.E+7]
+  crowdedness_people:
+    WHO+: [6.2E+6, 6.5E+6, 6.8E+6]
+  crowdedness_dollars:
+    80k: [280.E+9,300.E+9,320.E+9]
+    WHO+: [400.E+9, 430.E+9, 460.E+9]
+  tractability_people:
+    Me: [0.08,0.1,0.12]
+  tractability_dollars:
+    80k: [0.08,0.1,0.12]

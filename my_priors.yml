@@ -1,0 +1,63 @@
+# *** Format of estimates ***
+# Only input what I care about
+# Cause Area:
+#   Personal fit: percentiles (leverage ratio to adjust evidence)
+#   Reduction in X-risk/my career: percentiles
+#   Person-affecting human QALYs saved/my career: percentiles
+#   Near-term animal-inclusive HEWALYs saved/my career: percentiles
+#
+# percentiles are [tenth, *optional median, ninetieth]
+
+AIS:
+  Personal_fit: [0.1, 1.2]
+  LT: [0.000001, 0.001]
+  STH:
+  STA:
+
+EA:
+  Personal_fit: [0.5, 1.2]
+  LT: [0.000001, 0.001]
+  STH:
+  STA:
+
+GPR:
+  Personal_fit: [0.1, 2]
+  LT: [0.000001, 0.0001]
+  STH:
+  STA:
+
+Institutions:
+  Personal_fit:
+  LT:
+  STH:
+  STA:
+
+Factory farming:
+  Personal_fit: [0.05, 2]
+  LT: [1.00E-07, 0.0001]
+  STH:
+  STA:
+
+Biorisk:
+  Personal_fit: [0.5, 1.2]
+  LT: [0.000001, 0.001]
+  STH:
+  STA:
+
+Nuclear:
+  Personal_fit: [0.01, 0.3]
+  LT: [0.0000001, 0.0001]
+  STH:
+  STA:
+
+Health:
+  Personal_fit:
+  LT:
+  STH:
+  STA:
+
+Earn-to-give:
+  Personal_fit: [0.1, 2]
+  LT: [0.00001, 0.001]
+  STH:
+  STA:
