@@ -201,7 +201,7 @@ def my_plot(distr, evidence, median, posterior, aggregated, cause_area, estimate
 	ax.legend()
 	if log_scale:
 		plt.xscale('symlog')
-	fig.savefig('{} for {}.png'.format(estimate_type, cause_area), bbox_inches='tight')
+	fig.savefig('Aggregation Graphs/{} for {}.png'.format(estimate_type, cause_area), bbox_inches='tight')
 	plt.close(fig)
 
 # Functions for computing SNT using Monte Carlo simulation
@@ -371,9 +371,11 @@ if __name__ == '__main__':
 	propagated['Earn-to-give']['STH'][str(best_earn_to_give['STH']['cause'])] = best_earn_to_give['STH']['impact_dist']
 	propagated['Earn-to-give']['STA'][str(best_earn_to_give['STA']['cause'])] = best_earn_to_give['STA']['impact_dist']
 	
-	ax_LT.hist(best_earn_to_give['LT']['impact_dist'], bins=np.geomspace(1e-14, 1e-2, 80), label='Earn-to-give and donate to {} (highest impact)'.format(best_earn_to_give['LT']['cause']), histtype='step')
-	ax_STH.hist(best_earn_to_give['STH']['impact_dist'], bins=np.geomspace(1e-2, 1e10, 100), label='Earn-to-give and donate to {} (highest impact)'.format(best_earn_to_give['STH']['cause']), histtype='step')
-	ax_STA.hist(best_earn_to_give['STA']['impact_dist'], bins=np.append(np.geomspace(-1e10, -1e-2, 120), np.geomspace(1e-2, 1e18, 120)), label='Earn-to-give and donate to {} (highest impact)'.format(best_earn_to_give['STA']['cause']), histtype='step')
+	np.save("propagated.npy", propagated)
+
+	ax_LT.hist(best_earn_to_give['LT']['impact_dist'], bins=np.geomspace(1e-14, 1e-2, 80), label='Earn-to-give for {}'.format(best_earn_to_give['LT']['cause']), histtype='step')
+	ax_STH.hist(best_earn_to_give['STH']['impact_dist'], bins=np.geomspace(1e-2, 1e10, 100), label='Earn-to-give for {}'.format(best_earn_to_give['STH']['cause']), histtype='step')
+	ax_STA.hist(best_earn_to_give['STA']['impact_dist'], bins=np.append(np.geomspace(-1e10, -1e-2, 120), np.geomspace(1e-2, 1e18, 120)), label='Earn-to-give for {}'.format(best_earn_to_give['STA']['cause']), histtype='step')
 	ax_LT.set_title("Long-termist bucket")
 	ax_LT.set_xlabel("Reduction in p(extinction) per extra person")
 	ax_LT.set_ylabel("Probablity density")
@@ -386,11 +388,9 @@ if __name__ == '__main__':
 	ax_STA.set_xlabel("Near-term animal-inclusive HEWLAYs saved per extra person")
 	ax_STA.set_ylabel("Probablity density")
 	ax_STA.legend()
-
-	fig_LT.savefig('Distributions over estimated Long-termist', bbox_inches='tight')
-	figP_STH.savefig('', bbox_inches='tight')
-	fig_STA.savefig('', bbox_inches='tight')
-	np.save("propagated.npy", propagated)
+	fig_LT.savefig('Distributions over estimated reduction in p(extinction) per extra person', bbox_inches='tight', dpi=400)
+	fig_STH.savefig('Distributions over estimated person-affecting human QALYs saved per extra person', bbox_inches='tight', dpi=400)
+	fig_STA.savefig('Distributions over estimated near-term animal-inclusive HEWLAYs saved per extra person', bbox_inches='tight', dpi=400)
 
 	with open('results.csv', mode='w', newline='') as res_file:
 	    res_writer = csv.writer(res_file)

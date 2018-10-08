@@ -9,7 +9,7 @@
 # percentiles are [tenth, *optional median, ninetieth]
 
 AIS:
-  Personal_fit: [0.1, 1.2]
+  Personal_fit: [0.2, 1.2]
   LT: [0.000001, 0.001]
   STH:
   STA:
@@ -21,7 +21,7 @@ EA:
   STA:
 
 GPR:
-  Personal_fit: [0.1, 2]
+  Personal_fit: [0.3, 1.5]
   LT: [0.000001, 0.0001]
   STH:
   STA:
@@ -39,14 +39,14 @@ Factory farming:
   STA:
 
 Biorisk:
-  Personal_fit: [0.5, 1.2]
-  LT: [0.000001, 0.001]
+  Personal_fit: #[0.1, 1.2]
+  LT: #[0.000001, 0.001]
   STH:
   STA:
 
 Nuclear:
-  Personal_fit: [0.01, 0.3]
-  LT: [0.0000001, 0.0001]
+  Personal_fit: #[0.01, 0.3]
+  LT: #[0.0000001, 0.0001]
   STH:
   STA:
 
