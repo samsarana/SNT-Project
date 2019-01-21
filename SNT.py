@@ -17,6 +17,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 import theano
 import pymc3 as pm
+import sys
 
 # Globals: Z-scores for different confidence intervals; number of samples for MC methods; moral parameters for animal bucket
 Z_50 = 0.67449
@@ -26,8 +27,8 @@ NUM_SAMPLES_MCMC_AGGREGATION = 2000
 NUM_SAMPLES_MC_PROPAGATION = 10000
 SENTIENCE_ADJ = 0.0381
 WELLBEING_ADJ = -5
-LOWER_BOUND_DONATIONS = 50e3 * 20 # donating $50,000/year for 20 years
-UPPER_BOUND_DONATIONS = 250e3 * 25 # donating $250,000/year for 25 years
+LOWER_BOUND_DONATIONS = 50e3 * 20 # donating an average of $50,000/year for 20 years
+UPPER_BOUND_DONATIONS = 250e3 * 25 # donating an average of $250,000/year for 25 years
 
 # Inputs
 file_handle = open("SNT_estimates.yml")
@@ -78,6 +79,7 @@ def fit_norm(estimate):
 		q = robjects.FloatVector([tenth, median, ninetieth])
 		dist_as_str = fit_norm_r(p=p, q=q, show_output=False, plot=False).r_repr()
 		if dist_as_str == 'NA':
+			print(estimate)
 			raise ValueError('Distribtion could not be fitted to parameters!')
 		params_as_str = dist_as_str.strip('c(mean = )').partition(', sd = ')
 		mu, sigma = [float(params_as_str[i]) for i in (0,2)]
@@ -112,6 +114,7 @@ def fit_lognorm(estimate):
 		q = robjects.FloatVector([tenth, median, ninetieth])
 		dist_as_str = fit_lognorm_r(p=p, q=q, show_output=False, plot=False).r_repr()
 		if dist_as_str == 'NA':
+			print(estimate)
 			raise ValueError('Distribtion could not be fitted to parameters!')
 		params_as_str = dist_as_str.strip('c(meanlog = )').partition(', sdlog = ')
 		mu, sigma = [float(params_as_str[i]) for i in (0,2)]
@@ -133,6 +136,7 @@ def fit_beta(estimate):
 		q = robjects.FloatVector([tenth, median, ninetieth])
 	dist_as_str = fit_beta_r(p=p, q=q, show_output=False, plot=False).r_repr()
 	if dist_as_str == 'NA':
+		print(estimate)
 		raise ValueError('Distribtion could not be fitted to parameters!')
 	alpha_str, beta_str = [dist_as_str.partition(', shape2 = ')[i] for i in (0,2)]
 	alpha = float(alpha_str.partition('c(shape1 = ')[2])
@@ -166,7 +170,7 @@ def bayesian_update(likelihood_dist, observations, prior_parameters):
 		return posterior_theta1, posterior_theta2
 
 # Function for plotting evidence aggregation graphs
-def my_plot(distr, evidence, median, posterior, aggregated, cause_area, estimate_type, log_scale=False, sign=+1):
+def my_plot(distr, evidence, median, posterior, aggregated, cause_area, estimate_type, estimates, log_scale=False, sign=+1):
 	pdf, ppf = distr.pdf, distr.ppf
 	if log_scale:
 		min_x = min([np.log10(ppf(1e-6, *params)) for params in list(evidence.values()) + [median, posterior, aggregated]])
@@ -180,10 +184,18 @@ def my_plot(distr, evidence, median, posterior, aggregated, cause_area, estimate
 	ax.set_prop_cycle(cycler('color', ['b', 'g', 'c', 'y', 'r', 'm', 'k']))
 	for source, evidence_params in evidence.items():
 		ax.plot(sign*x, pdf(x, *evidence_params), alpha=0.6, label=str(source))
+		if not source == 'PS21 Report': # this report was not from confidence interval
+			pcentiles = estimates[cause_area][estimate_type][source]
+			if len(pcentiles) == 3: # then we want to plot/check fit (if just 2 pcentiles, fit will be perfect, we don't care)
+				for pcentile in pcentiles:
+					ax.plot(pcentile, 0, 'rx')
+				ax.plot(distr.ppf(0.1, *evidence_params), 0, 'go')
+				ax.plot(distr.ppf(0.5, *evidence_params), 0, 'go')
+				ax.plot(distr.ppf(0.9, *evidence_params), 0, 'go')
 	ax.plot(sign*x, pdf(x, *median), alpha=0.6, label='Median of evidence parameters')
 	ax.plot(sign*x, pdf(x, *posterior), alpha=0.6, label='Posterior')
 	ax.plot(sign*x, pdf(x, *aggregated), alpha=0.6, label='Average of median and posterior')
-	x_labels = {'scale_LT': 'Total X-risk associated with {} adjusting for the work that has already been done (probability of extinction)',
+	x_labels = {'scale_LT': 'Total X-risk associated with {} adjusting for the work that has already been done',
 			'scale_ST-Human': 'Presentist person-affecting human QALYs saved if remainder of {} solved',
 			'scale_ST-Animal': 'Farmed animal years saved in next 100 years if remainder of {} solved',
 			'crowdedness_people': 'Full-time staff',
@@ -237,11 +249,14 @@ def compute_SNT(scale, crowdedness, tractability):
 if __name__ == '__main__':
 	# Fit distributions
 	distributions = copy.deepcopy(estimates)
+	for cause_area, cause_area_estimates in distributions.items(): # exclude the funding_constraint parameter for now
+		del distributions[cause_area]['funding_constraint']
 	for cause_area, cause_area_estimates in estimates.items():
 		for estimate_type, parameter_estimates in cause_area_estimates.items():
-			if parameter_estimates:
+			if parameter_estimates and isinstance(parameter_estimates, dict):
 				for source, estimate in parameter_estimates.items():
 					dist = None
+					print('fitting', cause_area, estimate_type, source)
 					if estimate_type.startswith('scale_LT') or estimate_type.startswith('tractability'):
 						dist = fit_beta(estimate)
 					elif estimate_type.startswith('scale_ST'):
@@ -257,6 +272,7 @@ if __name__ == '__main__':
 	for cause_area, cause_area_dists in distributions.items():
 		for estimate_type, parameter_dists in cause_area_dists.items():
 			if parameter_dists: # i.e. if we have data for this estimate
+				print(cause_area, estimate_type, parameter_dists)
 				if estimate_type.startswith('scale_LT') or estimate_type.startswith('tractability'):# and cause_area == 'AIS' and estimate_type.startswith('scale_LT'):
 					theta1_list, theta2_list = zip(*parameter_dists.values())
 					# Aggregation method 1: calculate median of parameters
@@ -269,7 +285,7 @@ if __name__ == '__main__':
 					posterior_thetas = bayesian_update(pm.Beta, observations, prior_parameters)
 					agg_thetas = np.mean([median_thetas, posterior_thetas], axis=0)
 					aggregated[cause_area][estimate_type] = partial(np.random.beta, *agg_thetas, size=NUM_SAMPLES_MC_PROPAGATION)
-					my_plot(stats.beta, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type)
+					my_plot(stats.beta, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type, estimates)
 				elif estimate_type.startswith('scale_ST'):# and cause_area == 'Biorisk' 
 					sign = +1 # only for scale_ST i hackily make support for lognormal dist to have probabilty mass only over negative support
 					if list(parameter_dists.values())[0][1] < 0: # since I have either only +ve or only -ve lognormal distributions, this hack of checking if sigma is -ve (for which lognormal is undefined i.e. I've cooked it up) will do fine for now
@@ -285,10 +301,11 @@ if __name__ == '__main__':
 					sd_upper = 2 * np.mean(theta2_list) # sign *
 					prior_parameters = (0, mu_upper, 0, sd_upper)
 					observations = generate_observations(parameter_dists, np.random.lognormal, NUM_SAMPLES_MCMC_AGGREGATION)
+
 					posterior_thetas = bayesian_update(pm.Lognormal, observations, prior_parameters)
 					agg_thetas = np.mean([median_thetas, posterior_thetas], axis=0)
 					aggregated[cause_area][estimate_type] = partial(my_random_lognormal, *agg_thetas, sign, NUM_SAMPLES_MC_PROPAGATION)
-					my_plot(myStatsLognorm, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type, log_scale=True, sign=sign)
+					my_plot(myStatsLognorm, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type, estimates, log_scale=True, sign=sign)
 				elif estimate_type.startswith('crowdedness'):# and cause_area == 'Health' and estimate_type.startswith('crowdedness_dollars'):
 					theta1_list, theta2_list = zip(*parameter_dists.values())
 					# Aggregation method 1: calculate median of parameters
@@ -301,13 +318,15 @@ if __name__ == '__main__':
 					posterior_thetas = bayesian_update(pm.Normal, observations, prior_parameters)
 					agg_thetas = np.mean([median_thetas, posterior_thetas], axis=0)
 					aggregated[cause_area][estimate_type] = partial(np.random.normal, *agg_thetas, size=NUM_SAMPLES_MC_PROPAGATION)
-					my_plot(stats.norm, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type)
+					my_plot(stats.norm, parameter_dists, median_thetas, posterior_thetas, agg_thetas, cause_area, estimate_type, estimates)
 			else:
 				print('error!')
 				assert(False)
 				#aggregated[cause_area][estimate_type] = lambda : 0
 
-	propagated = dict() # changed this
+	np.save("aggregated.npy", aggregated)
+
+	propagated = dict()
 	mu_donations, sigma_donations = fit_lognorm((LOWER_BOUND_DONATIONS, UPPER_BOUND_DONATIONS))
 	total_donations = stats.lognorm.rvs(s=sigma_donations, scale=exp(mu_donations), size=NUM_SAMPLES_MC_PROPAGATION)
 	fig_LT, ax_LT = plt.subplots()
@@ -322,8 +341,13 @@ if __name__ == '__main__':
 		propagated[cause_area]['LT'] = dict()
 		propagated[cause_area]['LT']['Direct'] = snt
 		ax_LT.hist(snt, bins=np.geomspace(1e-14, 1e-2, 80), label=cause_area, histtype='step')
+
+		# fit beta distribution to funding_constraint ratio
+		alpha_funding_constr, beta_funding_constr = fit_beta(estimates[cause_area]['funding_constraint'])
+		funding_constr = stats.beta.rvs(a=alpha_funding_constr, b=beta_funding_constr, size=NUM_SAMPLES_MC_PROPAGATION)
+
 		# LT x 1/c dollars x t dollars
-		snt = compute_SNT(dists['scale_LT'], dists['crowdedness_dollars'], dists['tractability_dollars']) * total_donations
+		snt = compute_SNT(dists['scale_LT'], dists['crowdedness_dollars'], dists['tractability_dollars']) * total_donations * funding_constr
 		propagated[cause_area]['LT']['Earn'] = snt
 		
 		# (STH + X-effects) x 1/c people x t people
@@ -338,17 +362,20 @@ if __name__ == '__main__':
 		# Give this equal weight as other estimates combined (sample equally from GiveWell and rest)
 		if cause_area == 'Health':
 			np.append(snt, np.random.lognormal(-3.045886, 0.750309, NUM_SAMPLES_MC_PROPAGATION))
-		snt = snt_per_dollar * total_donations
+		# fit beta distribution to funding_constraint ratio
+		alpha_funding_constr, beta_funding_constr = fit_beta(estimates[cause_area]['funding_constraint'])
+		funding_constr = stats.beta.rvs(a=alpha_funding_constr, b=beta_funding_constr, size=NUM_SAMPLES_MC_PROPAGATION)
+		snt = snt_per_dollar * total_donations * funding_constr
 		propagated[cause_area]['STH']['Earn'] = snt
 		
-		# (adj*STA + STH) x 1/c people x t people # forget the X-effects here... too contentious
+		# (adj*STA + STH) x 1/c people x t people # forget the X-effects here
 		scale_ST_Animal_total = lambda: scale_ST_Human_total() - SENTIENCE_ADJ * WELLBEING_ADJ * dists['scale_ST-Animal']() # subtract because SENTIENCE_ADJ is _negative_ 5 
 		snt = compute_SNT(scale_ST_Animal_total, dists['crowdedness_people'], dists['tractability_people'])
 		propagated[cause_area]['STA'] = dict()
 		propagated[cause_area]['STA']['Direct'] = snt
 		ax_STA.hist(snt, bins=np.append(np.geomspace(-1e10, -1e-2, 120), np.geomspace(1e-2, 1e18, 120)), label=cause_area, histtype='step')
 		# (adj*STA + STH) x 1/c dollars x t dollars
-		snt = compute_SNT(scale_ST_Animal_total, dists['crowdedness_dollars'], dists['tractability_dollars']) * total_donations
+		snt = compute_SNT(scale_ST_Animal_total, dists['crowdedness_dollars'], dists['tractability_dollars']) * total_donations * funding_constr
 		propagated[cause_area]['STA']['Earn'] = snt
 	# identify top earn-to-give cause and add to plot
 	best_earn_to_give = {'LT': {'cause': None, 'impact_mean': 0, 'impact_dist': None},
@@ -377,7 +404,7 @@ if __name__ == '__main__':
 	ax_STH.hist(best_earn_to_give['STH']['impact_dist'], bins=np.geomspace(1e-2, 1e10, 100), label='Earn-to-give for {}'.format(best_earn_to_give['STH']['cause']), histtype='step')
 	ax_STA.hist(best_earn_to_give['STA']['impact_dist'], bins=np.append(np.geomspace(-1e10, -1e-2, 120), np.geomspace(1e-2, 1e18, 120)), label='Earn-to-give for {}'.format(best_earn_to_give['STA']['cause']), histtype='step')
 	ax_LT.set_title("Long-termist bucket")
-	ax_LT.set_xlabel("Reduction in p(extinction) per extra person")
+	ax_LT.set_xlabel("Reduction in X-risk per extra person")
 	ax_LT.set_ylabel("Probablity density")
 	ax_LT.legend()
 	ax_STH.set_title("Short-termist, human-centric bucket")
@@ -388,7 +415,7 @@ if __name__ == '__main__':
 	ax_STA.set_xlabel("Near-term animal-inclusive HEWLAYs saved per extra person")
 	ax_STA.set_ylabel("Probablity density")
 	ax_STA.legend()
-	fig_LT.savefig('Distributions over estimated reduction in p(extinction) per extra person', bbox_inches='tight', dpi=400)
+	fig_LT.savefig('Distributions over estimated reduction in X-risk per extra person', dpi=400)
 	fig_STH.savefig('Distributions over estimated person-affecting human QALYs saved per extra person', bbox_inches='tight', dpi=400)
 	fig_STA.savefig('Distributions over estimated near-term animal-inclusive HEWLAYs saved per extra person', bbox_inches='tight', dpi=400)
 

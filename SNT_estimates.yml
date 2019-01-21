@@ -17,102 +17,143 @@ AIS:
     OxPrio: [0.001, 0.01, 0.06] 
     FHI_08: [0.01, 0.05, 0.15]
     80k: [0.01, 0.1]
+    survey: [0.05,0.6]
   scale_ST-Human:
     Me: [12.4e+9, 74.1e+9]
+    survey: [1000000, 8000000000]
   scale_ST-Animal:
     Me: [10, 2.9e+8]
+    survey: [1000000, 29000000000]
   crowdedness_people:
     Me: [40,50,70]
+    survey: [30, 50]
   crowdedness_dollars:
     80k: [8.e+6, 10.e+6, 12.e+6]
+    Me: [10.e+6, 12.e+6]
   tractability_people:
-    OxPrio: [0.001,0.01,0.06]
-  tractability_dollars:
     80k: [0.005, 0.01, 0.02]
+    OxPrio: [0.001,0.01,0.06]
+    survey: [0.1, 0.2]
+  tractability_dollars:
+    Me: [0.001, 0.005]
+  funding_constraint: [1.e-4, 1.e-2]
 
 EA:
   scale_LT:
     80k: [0.001, 0.01]
+    survey: [1.e-8, 1.e-4, 1.e-2]
   scale_ST-Human:
     80k: [3250000000,32500000000]
+    survey: [1.e+6, 1.e+8, 1.e+10]
   scale_ST-Animal:
     Me: [1.e+6, 2.9e+10]
+    survey: [1.e+8, 1.e+11, 1.e+13]
   crowdedness_people:
     Me: [50,80,120]
+    survey: [10, 1000]
   crowdedness_dollars:
     80k: [5.E+6, 10.E+6]
+    survey: [2.e+6, 1.e+9]
   tractability_people:
     Me: [0.001,0.01,0.1]
+    survey: [0.01, 0.05, 0.143]
   tractability_dollars:
     80k: [0.001,0.01,0.1]
+    survey: [0.0001, 0.01, 0.1]
+  funding_constraint: [1.e-4, 1.e-2]
 
 GPR:
   scale_LT:
     80K: [0.001,0.01]
+    survey: [1.e-20, 0.025]
   scale_ST-Human:
-    Me: [2.5E+9, 2.5E+10]
+    #Me: [2.5E+9, 2.5E+10]
+    survey: [1, 100000000]
   scale_ST-Animal:
-    Me: [29.E+6, 29.E+8]
+    #Me: [29.E+6, 29.E+8]
+    survey: [1, 60000000000]
   crowdedness_people:
     Me: [10,30,50]
+    survey: [50, 150]
   crowdedness_dollars:
     80k: [5.E+6, 10.E+6]
+    survey: [800000,80000000]
   tractability_people:
     Me: [0.001,0.015,0.1]
+    survey: [1.e-4,0.005,0.015]
   tractability_dollars:
     80k: [0.001,0.01,0.1]
+    survey: [1.e-4,0.002,0.006]
+  funding_constraint: [1.e-4, 1.e-2]
 
 Institutions:
   scale_LT:
     80k: [0.001,0.01]
+    survey: [0.01, 0.05, 0.2]
   scale_ST-Human:
     Me: [2.5E+9, 2.5E+10]
+    survey: [1.e+9, 5.e+10]
   scale_ST-Animal:
     Me: [29.E+6, 29.E+8]
   crowdedness_people:
     80k: [100,1000]
+    survey: [10, 5000]
   crowdedness_dollars:
     80k: [5.E+6, 1.5E+8]
   tractability_people:
     80k: [0.005,0.01,0.015]
+    survey: [0.005,0.01,0.015]
   tractability_dollars:
-    80k: [0.005,0.01,0.015]
+    survey: [0.001,0.002,0.003]
+  funding_constraint: [1.e-4, 1.e-2]
 
 Factory farming:
   scale_LT:
     80k: [0.0001,0.001]
+    survey: [1.e-8, 0.01, 0.1]
   scale_ST-Human:
     Me: [1,10] # so that the lognormal fitter doesn't break (but really it's zero)
   scale_ST-Animal:
     Bollard podcast: [1.0E+12,2.9E+12]
+    survey: [200.e+9, 3.e+12]
   crowdedness_people:
     80k: [800,1000,1200]
+    survey: [600,900,1200]
   crowdedness_dollars:
     80k: [10.E+6, 100.E+6]
     Bollard podcast: [4.9E+7,5.1E+7]
+    survey: [100.E+6,125.E+6,150.E+6]
   tractability_people:
     80k: [0.008, 0.01, 0.012]
+    survey: [1.e-10,0.01,0.2]
   tractability_dollars:
     80k: [0.008, 0.01, 0.012]
+    survey: [1.e-10,0.01,0.2]
+  funding_constraint: [0.8,0.999]
 
 Biorisk:
   scale_LT:
     80k: [0.01,0.1]
     GPP GCR report 2016 (extinction from an engineered pandemic): [0.00007, 0.07]
     FHI_08: [0.001,0.02,0.1]
+    survey: [0.0005, 0.015, 0.08]
   scale_ST-Human:
     GPP GCR report 2016 (non-extinction from a natural pandemic): [380.E+6, 36.E+9]
     UK National Risk Register (as cited in GPP GCR report): [5.24E+08, 2.10E+09]
   scale_ST-Animal:
     Me: [1,10] # proxy for 0 that won't break lognormal
   crowdedness_people:
-    80k: [8,12]
+    survey: [5, 1000]
   crowdedness_dollars:
     80k: [1.E+9, 5.E+9]
+    survey: [2.e+6, 4.e+9]
   tractability_people:
     Me: [0.008, 0.01, 0.012]
+    survey: [0.02, 0.05, 0.15]
   tractability_dollars:
     80k: [0.008, 0.01, 0.012]
+    survey: [0.005, 0.1]
+  funding_constraint: [1.e-4, 1.e-2]
 
 Nuclear:
   scale_LT:
@@ -131,6 +172,7 @@ Nuclear:
     Me: [0.001,0.01]
   tractability_dollars:
     80k: [0.001,0.01]
+  funding_constraint: [1.e-4, 1.e-2]
 
 Health:
   scale_LT:
@@ -148,3 +190,4 @@ Health:
     Me: [0.08,0.1,0.12]
   tractability_dollars:
     80k: [0.08,0.1,0.12]
+  funding_constraint: [0.9,0.999]
